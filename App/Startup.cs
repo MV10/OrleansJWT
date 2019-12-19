@@ -1,10 +1,11 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Net.Http;
 using System.Threading.Tasks;
+using IdentityModel.Client;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.HttpsPolicy;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -25,7 +26,15 @@ namespace App
             services.AddRazorPages();
 
             // add this
+            services.AddMemoryCache(); // NOT PRODUCTION-FRIENDLY (needs configuration)
             services.AddHttpClient();
+            services.AddSingleton<IDiscoveryCache>(sp =>
+            {
+                var factory = sp.GetRequiredService<IHttpClientFactory>();
+                return new DiscoveryCache(
+                    "https://demo.identityserver.io",
+                    () => factory.CreateClient());
+            });
 
             // add this
             services.AddAuthentication(options =>
@@ -37,8 +46,7 @@ namespace App
             .AddOpenIdConnect("oidc", options =>
             {
                 options.Authority = "https://demo.identityserver.io/";
-                options.ClientId = "interactive.confidential"; // 60 minutes
-                //options.ClientId = "interactive.confidential.short"; // 75 seconds
+                options.ClientId = "interactive.confidential";
                 options.ClientSecret = "secret";
                 options.ResponseType = "code";
                 options.SaveTokens = true;
@@ -66,7 +74,7 @@ namespace App
 
             app.UseRouting();
 
-            app.UseAuthentication();
+            app.UseAuthentication(); // add this
             app.UseAuthorization();
 
             app.UseEndpoints(endpoints =>

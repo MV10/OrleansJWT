@@ -28,10 +28,6 @@ namespace App
                     parts.AddApplicationPart(
                         typeof(SecureAdderGrain).Assembly)
                         .WithReferences();
-
-                    //parts.AddApplicationPart(
-                    //    typeof(AccessTokenValidationFilter).Assembly)
-                    //    .WithReferences();
                 });
             });
 
@@ -42,13 +38,5 @@ namespace App
 
             await host.RunConsoleAsync();
         }
-
-        // EF garbage
-        //public static IHostBuilder CreateHostBuilder(string[] args) =>
-        //    Host.CreateDefaultBuilder(args)
-        //        .ConfigureWebHostDefaults(webBuilder =>
-        //        {
-        //            webBuilder.UseStartup<Startup>();
-        //        });
     }
 }

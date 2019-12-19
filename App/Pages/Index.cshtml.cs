@@ -19,15 +19,17 @@ namespace App.Pages
             this.clusterClient = clusterClient;
         }
 
-        public string TokenExpiration;
-        public string ApiResult;
+        public string LoginExpiration;
         public string FilterResult;
+        public string ApiResult;
 
         public async Task OnGet()
         {
             ApiResult = "(click Call API button)";
             FilterResult = ApiResult;
-            TokenExpiration = await HttpContext.GetTokenAsync("expires_at") ?? "(no expiration claim)";
+            LoginExpiration = 
+                await HttpContext.GetTokenAsync("expires_at") 
+                ?? "(no expiration claim)";
         }
 
         public IActionResult OnGetLogin()
@@ -62,7 +64,10 @@ namespace App.Pages
             int v2 = random.Next(1, 100);
             var result = await adder.Add(v1, v2);
 
-            ApiResult = $"Add({v1}, {v2}) = {result.Result}";
+            ApiResult = result.Success
+                ? $"Add({v1}, {v2}) = {result.Result}"
+                : "(unsuccessful)";
+
             FilterResult = result.Message ?? "(no message)";
         }
     }
